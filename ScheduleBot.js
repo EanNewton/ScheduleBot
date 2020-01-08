@@ -19,7 +19,7 @@ function arrayContains(arr, searchFor){
 
 var Discord = require('discord.io');
 var logger = require('winston');
-//var auth = require('./auth.json');
+var auth = require('./auth.json');
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(new logger.transports.Console, {
@@ -54,8 +54,7 @@ var mysched = [
     [6, "off", 0]];
 
 var admins = 
-    ["userIDs"
-    ];
+    ["user IDs go here"];
 
 bot.on('message', function (user, userID, channelID, message, evt) {
     if (message.substring(0, 1) == '$') {
@@ -68,7 +67,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             case 'addadmin': 
             try{
                 if(arrayContains(admins, userID)){
-                    admins.push(args[0];
+                    admins.push(args[0]);
                     bot.sendMessage({
                     to: channelID,
                     message: "Success. Added: "+args[0]
@@ -85,13 +84,48 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 });
                 }
             break;
+            
+            case 'delstream': 
+            try{
+                if(arrayContains(admins, userID)){
+                    if(args[0] < mysched.length){
+                        var toRem = mysched[args[0]];
+                        var banner = weekdays[toRem[0]]+" "+toRem[1]+":"+toRem[2];
+                        mysched.splice(args[0], 1);                  
+                        
+                        bot.sendMessage({
+                        to: channelID,
+                        message: "Success. Removed: "+banner
+                    });
+                    }else{
+                    bot.sendMessage({
+                    to: channelID,
+                    message: "No stream found at index: "+args[0]
+                });}
+                }else{
+                    bot.sendMessage({
+                    to: channelID,
+                    message: "Sorry, you do not have permission to use that command."
+                });}
+                } catch(e) {
+                bot.sendMessage({
+                to: channelID,
+                message: "Something went wrong..."
+                });
+                }
+            break;
                
             case 'addstream':
                 try{
                 if(arrayContains(admins, userID)){
-                    if(args[0] < 0 || args[0] > 6) {break;}
-                    if(args[1] < 0 || args[1] > 23){break;}
-                    if(args[2] < 0 || args[2] > 59){break;}
+                    if(args[0] < 0 || args[0] > 06 ||
+                       args[1] < 0 || args[1] > 23 ||
+                       args[2] < 0 || args[2] > 59){
+                        bot.sendMessage({
+                        to: channelID,
+                        message: "Invalid time."
+                        }); break;
+                    }
                     
                     //Grab any comments
                     var comments = "";
@@ -110,9 +144,11 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         }
                     }if(flag == 0){mysched.push(toAdd);}
                     
+                    var banner = 
+                        weekdays[args[0]]+" "+args[1]+":"+args[2]+" "+comments;  
                     bot.sendMessage({
                     to: channelID,
-                    message: "Success."
+                    message: "Success. Added: "+banner
                 });
                 }else{
                     bot.sendMessage({
@@ -160,18 +196,27 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                
             case 'schedule':
                 var locale = args[0];
+                var divider =
+                "<<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>>\n";
                 
                 if(locale == "help" || locale == "timezones"){
                     if(arrayContains(admins, userID)){
                     bot.sendMessage({
                     to: channelID,
                     message: "Commands are `!timezones` and `!schedule"+
-                             " [Continent]/[City]`"+
-                             "\n\nAdmin Commands are:\n"+
-                             "`!clearsched` to delete the entire schedule.\n"+
+                             " [Continent]/[City]`"+divider+
+                             "Admin Commands are:\n"+
+                             "`!clearsched` to delete the entire schedule.\n\n"+
                              "`!addstream [day] [hours] [minutes] [comments]`"+
                              " to add a stream. [day] is 0-6, 0 being Monday."+
-                             " [hours] is 0-23, 0 being Midnight."
+                             " [hours] is 0-23, 0 being Midnight.\n\n"+
+                             "`!delstream [index]` to delete the nth stream"+
+                             " from schedule. Index = 0 would be the stream"+
+                             " at the top of the schedule.\n\n"+
+                             "`!addadmin [User ID]` adds an admin to the bots"+
+                             " list. To acquire the ID turn on Dev Mode in "+
+                             "Discord's settings under the Appearance menu, "+
+                             "then right click the user and select Copy ID."
                              
                     });
                     }else{
@@ -209,8 +254,6 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     }
                 }
                 
-                var divider =
-                "<<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>>\n";
                 var banner = 
                     divider+localDT[0]+" "+
                     localDT[1]+":"+localDT[2]+":"+localDT[3]+
