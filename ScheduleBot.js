@@ -54,7 +54,8 @@ var mysched = [
     [6, "off", 0]];
 
 var admins = 
-    ["user IDs go here"];
+    ["User IDs go here",
+    ];
 
 bot.on('message', function (user, userID, channelID, message, evt) {
     if (message.substring(0, 1) == '$') {
@@ -197,14 +198,14 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             case 'schedule':
                 var locale = args[0];
                 var divider =
-                "<<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>>\n";
+                "\n<<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>>\n";
                 
                 if(locale == "help" || locale == "timezones"){
                     if(arrayContains(admins, userID)){
                     bot.sendMessage({
                     to: channelID,
                     message: "Commands are `!timezones` and `!schedule"+
-                             " [Continent]/[City]`"+divider+
+                             " [Continent]/[City]`\n"+divider+
                              "Admin Commands are:\n"+
                              "`!clearsched` to delete the entire schedule.\n\n"+
                              "`!addstream [day] [hours] [minutes] [comments]`"+
@@ -213,8 +214,8 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                              "`!delstream [index]` to delete the nth stream"+
                              " from schedule. Index = 0 would be the stream"+
                              " at the top of the schedule.\n\n"+
-                             "`!addadmin [User ID]` adds an admin to the bots"+
-                             " list. To acquire the ID turn on Dev Mode in "+
+                             "`!addadmin [User ID]` adds an admin to the bot's"+
+                             " list. To acquire the ID, turn on Dev Mode in "+
                              "Discord's settings under the Appearance menu, "+
                              "then right click the user and select Copy ID."
                              
